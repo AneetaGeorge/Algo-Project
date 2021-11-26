@@ -1,11 +1,25 @@
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.nio.file.*;
 
 
 public class Basic_3962312097 {
+
     private static Map<String, Integer> mismatchCost = new HashMap<>();
     private static String inputString1, inputString2;
     private static int gapPenalty = 30;
+    private static final String OUTPUT_FILENAME = "Output.txt";
+
+    public static void main(String[] args){
+        setMismatchCost();
+
+        String fileName = args[0];
+        fileReader(fileName);
+
+        int[][] OPT = findMinCostAlignment(inputString1, inputString2, gapPenalty , mismatchCost);
+        findAlignment(OPT, inputString1, inputString2, gapPenalty, mismatchCost);
+    }
 
     private static void setMismatchCost(){
         String[] genes = {"AA", "CC", "GG", "TT", "AC","AG","AT","CG","CT","GT"};
@@ -17,15 +31,6 @@ public class Basic_3962312097 {
             }
 
     }
-    public static void main(String[] args){
-        setMismatchCost();
-
-        String fileName = args[0];
-        fileReader(fileName);
-
-        int[][] OPT = findMinCostAlignment(inputString1, inputString2, gapPenalty , mismatchCost);
-        findAlignment(OPT, inputString1, inputString2, gapPenalty, mismatchCost);
-    }
 
     private static String inputGenerator(String input, int index)
     {
@@ -33,6 +38,38 @@ public class Basic_3962312097 {
         String secondHalf = input.substring(index+1, input.length());
 
         return firstHalf + input + secondHalf;
+    }
+
+    private static void fileReader(String fileName){
+        try {
+            File myObj = new File(fileName);
+            Scanner myReader = new Scanner(myObj);
+            String tempString = "";
+
+            while (myReader.hasNextLine()) {
+                String data = myReader.nextLine();
+                data = data.trim();
+
+                if(Character.isAlphabetic(data.charAt((0))))
+                {
+                    if(!tempString.equals(""))
+                        inputString1 = tempString;
+
+                    tempString = data;
+                }
+                else
+                {
+                    tempString = inputGenerator(tempString, Integer.parseInt(data));
+                }
+            }
+
+            inputString2 = tempString;
+            myReader.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+
     }
 
     private static int[][] findMinCostAlignment(String string1, String string2, int gapPenalty, Map<String, Integer> mismatchCost)
@@ -107,37 +144,25 @@ public class Basic_3962312097 {
         System.out.println(alignmentString1.substring(0,50) + " " + alignmentString2.substring(0,50));
         System.out.println(alignmentString1.substring(alignmentString1.length() - 50) + " " + alignmentString2.substring(alignmentString2.length() - 50));
 
+        writeAlignmentToFile(alignmentString1, alignmentString2, OUTPUT_FILENAME);
     }
 
-    private static void fileReader(String fileName){
-        try {
-            File myObj = new File(fileName);
-            Scanner myReader = new Scanner(myObj);
-            String tempString = "";
+    private static void writeAlignmentToFile(String alignStr1, String alignStr2, String filename)
+    {
+        String line1 = alignStr1.substring(0,50) + " " + alignStr2.substring(0,50);
+        String line2 = alignStr1.substring(alignStr1.length() - 50) + " " + alignStr2.substring(alignStr2.length() - 50);
 
-            while (myReader.hasNextLine()) {
-                String data = myReader.nextLine();
-                data = data.trim();
-
-                if(Character.isAlphabetic(data.charAt((0))))
-                {
-                    if(!tempString.equals(""))
-                        inputString1 = tempString;
-
-                    tempString = data;
-                }
-                else
-                {
-                    tempString = inputGenerator(tempString, Integer.parseInt(data));
-                }
-            }
-
-            inputString2 = tempString;
-            myReader.close();
-        } catch (FileNotFoundException e) {
-            System.out.println("An error occurred.");
-            e.printStackTrace();
+        List<String> lines = Arrays.asList(line1, line2);
+        Path file = Paths.get(filename);
+        try
+        {
+            Files.write(file, lines, StandardCharsets.UTF_8);
+        }
+        catch(Exception e)
+        {
+            System.out.println("Exception occurred while writing to File : " + e.toString());
         }
 
     }
+
 }
