@@ -3,11 +3,11 @@ import java.util.*;
 
 
 public class Basic_3962312097 {
-    private static Map<String, Integer> mismatchCost;
-    private static String string1, string2;
+    private static Map<String, Integer> mismatchCost = new HashMap<>();
+    private static String inputString1, inputString2;
+    private static int gapPenalty = 30;
 
-    public Basic_3962312097(){
-        mismatchCost = new HashMap<>();
+    private static void setMismatchCost(){
         String[] genes = {"AA", "CC", "GG", "TT", "AC","AG","AT","CG","CT","GT"};
         Integer[] gap = {0, 0, 0, 0, 110, 48, 94, 118, 48, 110};
             for(int i =0; i < genes.length; i++)
@@ -18,14 +18,13 @@ public class Basic_3962312097 {
 
     }
     public static void main(String[] args){
+        setMismatchCost();
 
-        int gapPenalty = 30;
-        Basic_3962312097 nI = new Basic_3962312097();
         String fileName = args[0];
         fileReader(fileName);
 
-        int[][] OPT = findMinCostAlignment(string1, string2, gapPenalty , mismatchCost);
-        findAlignment(OPT, string1, string2, gapPenalty, mismatchCost);
+        int[][] OPT = findMinCostAlignment(inputString1, inputString2, gapPenalty , mismatchCost);
+        findAlignment(OPT, inputString1, inputString2, gapPenalty, mismatchCost);
     }
 
     private static String inputGenerator(String input, int index)
@@ -64,49 +63,49 @@ public class Basic_3962312097 {
     private static void findAlignment(int[][] OPT, String string1, String string2, int gapPenalty, Map<String, Integer> mismatchCost)
     {
         int m = string1.length(), n = string2.length();
-        String s1 = "", s2 = "";
+        String alignmentString1 = "", alignmentString2 = "";
 
         while(m > 0 && n > 0)
         {
             if(OPT[m][n] == OPT[m-1][n-1] + mismatchCost.get(String.valueOf(string1.charAt(m-1)) + String.valueOf(string2.charAt(n-1))))
             {
-                s1 = string1.charAt(m-1) + s1;
-                s2 = string2.charAt(n-1) + s2;
+                alignmentString1 = string1.charAt(m-1) + alignmentString1;
+                alignmentString2 = string2.charAt(n-1) + alignmentString2;
 
                 m--;
                 n--;
             }
             else if(OPT[m][n] == OPT[m-1][n] + gapPenalty)
             {
-                s1 = string1.charAt(m-1) + s1;
-                s2 = "_" + s2;
+                alignmentString1 = string1.charAt(m-1) + alignmentString1;
+                alignmentString2 = "_" + alignmentString2;
 
                 m--;
             }
             else
             {
-                s1 = "_" + s1;
-                s2 = string2.charAt(n-1) + s2;
+                alignmentString1 = "_" + alignmentString1;
+                alignmentString2 = string2.charAt(n-1) + alignmentString2;
                 n--;
             }
         }
 
         while(m > 0)
         {
-            s1 = string1.charAt(m-1) + s1;
-            s2 = "_" + s2;
+            alignmentString1 = string1.charAt(m-1) + alignmentString1;
+            alignmentString2 = "_" + alignmentString2;
             m--;
         }
 
         while(n > 0)
         {
-            s1 = "_" + s1;
-            s2 = string2.charAt(n-1) + s2;
+            alignmentString1 = "_" + alignmentString1;
+            alignmentString2 = string2.charAt(n-1) + alignmentString2;
             n--;
         }
 
-        System.out.println(s1.substring(0,50) + " " + s2.substring(0,50));
-        System.out.println(s1.substring(s1.length() - 50) + " " + s2.substring(s2.length() - 50));
+        System.out.println(alignmentString1.substring(0,50) + " " + alignmentString2.substring(0,50));
+        System.out.println(alignmentString1.substring(alignmentString1.length() - 50) + " " + alignmentString2.substring(alignmentString2.length() - 50));
 
     }
 
@@ -123,7 +122,7 @@ public class Basic_3962312097 {
                 if(Character.isAlphabetic(data.charAt((0))))
                 {
                     if(!tempString.equals(""))
-                        string1 = tempString;
+                        inputString1 = tempString;
 
                     tempString = data;
                 }
@@ -133,7 +132,7 @@ public class Basic_3962312097 {
                 }
             }
 
-            string2 = tempString;
+            inputString2 = tempString;
             myReader.close();
         } catch (FileNotFoundException e) {
             System.out.println("An error occurred.");
