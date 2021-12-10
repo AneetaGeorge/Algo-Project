@@ -17,8 +17,15 @@ public class Basic_3962312097 {
         String fileName = args[0];
         fileReader(fileName);
 
-        int[][] OPT = findMinCostAlignment(inputString1, inputString2, gapPenalty , mismatchCost);
-        findAlignment(OPT, inputString1, inputString2, gapPenalty, mismatchCost);
+        List<String> alignment = findMinCostAlignment(inputString1, inputString2, gapPenalty , mismatchCost);
+
+        String alignmentString1 = alignment.get(0);
+        String alignmentString2 = alignment.get(1);
+
+        System.out.println(alignmentString1.substring(0,50) + " " + alignmentString1.substring(alignmentString1.length() - 50));
+        System.out.println(alignmentString2.substring(0,50) + " " + alignmentString2.substring(alignmentString2.length() - 50));
+
+
     }
 
     private static void setMismatchCost(){
@@ -72,15 +79,15 @@ public class Basic_3962312097 {
 
     }
 
-    private static int[][] findMinCostAlignment(String string1, String string2, int gapPenalty, Map<String, Integer> mismatchCost)
+    private static List<String> findMinCostAlignment(String string1, String string2, int gapPenalty, Map<String, Integer> mismatchCost)
     {
         int OPT[][] = new int[string1.length() + 1][string2.length() + 1];
 
         for(int i = 0; i <= string1.length(); i++)
-            OPT[0][i] = i * gapPenalty;
+            OPT[i][0] = i * gapPenalty;
 
         for(int j = 0; j <= string2.length(); j++)
-            OPT[j][0] = j * gapPenalty;
+            OPT[0][j] = j * gapPenalty;
 
         for(int j = 1; j <= string2.length();j++)
         {
@@ -93,11 +100,11 @@ public class Basic_3962312097 {
         }
 
         System.out.println("Minimum cost of alignment is : " + OPT[string1.length()][string2.length()]);
-        return OPT;
+        return findAlignment(OPT, string1, string2, gapPenalty, mismatchCost);
 
     }
 
-    private static void findAlignment(int[][] OPT, String string1, String string2, int gapPenalty, Map<String, Integer> mismatchCost)
+    private static List<String> findAlignment(int[][] OPT, String string1, String string2, int gapPenalty, Map<String, Integer> mismatchCost)
     {
         int m = string1.length(), n = string2.length();
         String alignmentString1 = "", alignmentString2 = "";
@@ -141,10 +148,13 @@ public class Basic_3962312097 {
             n--;
         }
 
-        System.out.println(alignmentString1.substring(0,50) + " " + alignmentString2.substring(0,50));
-        System.out.println(alignmentString1.substring(alignmentString1.length() - 50) + " " + alignmentString2.substring(alignmentString2.length() - 50));
+        List<String> alignment = new ArrayList<>();
+        alignment.add(alignmentString1);
+        alignment.add(alignmentString2);
 
         writeAlignmentToFile(alignmentString1, alignmentString2, OUTPUT_FILENAME);
+
+        return alignment;
     }
 
     private static void writeAlignmentToFile(String alignStr1, String alignStr2, String filename)
