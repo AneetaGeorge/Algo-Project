@@ -4,14 +4,19 @@ import java.util.*;
 import java.nio.file.*;
 
 
-public class Basic_3962312097 {
+public class Basic_3962312097_1912522772_9153191959 {
 
     private static Map<String, Integer> mismatchCost = new HashMap<>();
     private static String inputString1, inputString2;
     private static int gapPenalty = 30;
-    private static final String OUTPUT_FILENAME = "Output.txt";
+    private static final String OUTPUT_FILENAME = "output.txt";
+    private static double minAlignCost;
 
     public static void main(String[] args){
+
+        long memUsedBefore = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
+        long startTime = System.currentTimeMillis();
+
         setMismatchCost();
 
         String fileName = args[0];
@@ -22,12 +27,17 @@ public class Basic_3962312097 {
         String alignmentString1 = alignment.get(0);
         String alignmentString2 = alignment.get(1);
 
-        System.out.println(alignmentString1.substring(0,50) + " " + alignmentString1.substring(alignmentString1.length() - 50));
-        System.out.println(alignmentString2.substring(0,50) + " " + alignmentString2.substring(alignmentString2.length() - 50));
+        long endTime = System.currentTimeMillis();
+        long memUsedAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
 
+        writeAlignmentToFile(alignmentString1, alignmentString2, minAlignCost, (memUsedAfter-memUsedBefore) / 1024,
+                (endTime - startTime)*(Math.pow(10,-3)), OUTPUT_FILENAME );
 
     }
 
+    /**
+     This function initializes the hashmap 'mismatchCost' consisting of penalties for replacing a character 'i' with character 'j'
+     */
     private static void setMismatchCost(){
         String[] genes = {"AA", "CC", "GG", "TT", "AC","AG","AT","CG","CT","GT"};
         Integer[] gap = {0, 0, 0, 0, 110, 48, 94, 118, 48, 110};
@@ -39,6 +49,12 @@ public class Basic_3962312097 {
 
     }
 
+    /**
+     This function generates the input string from the base string and index provided in input.txt
+     @param input : The base string
+     @param index : The index where the string needs to be added again
+     @return The input string to be used for alignment
+     */
     private static String inputGenerator(String input, int index)
     {
         String firstHalf = input.substring(0, index+1);
@@ -47,6 +63,12 @@ public class Basic_3962312097 {
         return firstHalf + input + secondHalf;
     }
 
+    /**
+     Create two different strings appended again and again at the location specified after the
+     string in the file.
+     @param fileName : the name of the file to read from
+     @throws FileNotFoundException if the file is not found
+     */
     private static void fileReader(String fileName){
         try {
             File myObj = new File(fileName);
@@ -79,6 +101,15 @@ public class Basic_3962312097 {
 
     }
 
+    /**
+     This function fills the OPT array using the recurrence to find the minimum cost alignment and invokes findAlignment
+     to return the actual alignment
+     @param string1 : 1st input string
+     @param string2 : 2nd input string
+     @param gapPenalty : the penalty for adding a gap ("_")
+     @param mismatchCost : a hashmap consisting of penalties for replacing a character 'i' with character 'j'
+     @return The alignment is returned as a list of 2 strings
+     */
     private static List<String> findMinCostAlignment(String string1, String string2, int gapPenalty, Map<String, Integer> mismatchCost)
     {
         int OPT[][] = new int[string1.length() + 1][string2.length() + 1];
@@ -99,11 +130,20 @@ public class Basic_3962312097 {
             }
         }
 
-        System.out.println("Minimum cost of alignment is : " + OPT[string1.length()][string2.length()]);
+        minAlignCost = OPT[string1.length()][string2.length()];
         return findAlignment(OPT, string1, string2, gapPenalty, mismatchCost);
 
     }
 
+    /**
+     This function finds the actual alignment of the strings by backtracking the OPT array values
+     @param OPT : the OPT array consisting of cost of alignments
+     @param string1 : 1st input string
+     @param string2 : 2nd input string
+     @param gapPenalty : the penalty for adding a gap ("_")
+     @param mismatchCost : a hashmap consisting of penalties for replacing a character 'i' with character 'j'
+     @return The alignment is returned as a list of 2 strings
+     */
     private static List<String> findAlignment(int[][] OPT, String string1, String string2, int gapPenalty, Map<String, Integer> mismatchCost)
     {
         int m = string1.length(), n = string2.length();
@@ -152,17 +192,26 @@ public class Basic_3962312097 {
         alignment.add(alignmentString1);
         alignment.add(alignmentString2);
 
-        writeAlignmentToFile(alignmentString1, alignmentString2, OUTPUT_FILENAME);
-
         return alignment;
     }
 
-    private static void writeAlignmentToFile(String alignStr1, String alignStr2, String filename)
+    /**
+     This function writes the alignment (first 50 & last 50 characters), the alignment cost, the time & memory taken by
+     the program to "Output.txt" file
+     @param alignStr1 : alignment of the 1st string
+     @param alignStr2 : alignment of the 2nd string
+     @param alignCost : minimum cost of alignment between the strings
+     @param memory : total Memory used by the program
+     @param execTime : total time taken by the program
+     @param filename : output filename
+     @throws FileNotFoundException if the file is not found
+     */
+    private static void writeAlignmentToFile(String alignStr1, String alignStr2, double alignCost, double memory, double execTime, String filename)
     {
         String line1 = alignStr1.substring(0,50) + " " + alignStr2.substring(0,50);
         String line2 = alignStr1.substring(alignStr1.length() - 50) + " " + alignStr2.substring(alignStr2.length() - 50);
 
-        List<String> lines = Arrays.asList(line1, line2);
+        List<String> lines = Arrays.asList(line1, line2, String.valueOf(alignCost), String.valueOf(execTime), String.valueOf(memory));
         Path file = Paths.get(filename);
         try
         {

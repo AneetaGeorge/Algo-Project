@@ -1,13 +1,19 @@
-package testFiles;
-
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
-public class efficientSoln{
+public class Efficient_3962312097_1912522772_9153191959{
     private static Map<String, Integer> mismatchCost;
-    private static String string1, string2;
+    private static String inputString1, inputString2;
     private static int gapPenalty;
+    private static final String OUTPUT_FILENAME = "output.txt";
 
+    /**
+     This function initializes the hashmap 'mismatchCost' consisting of penalties for replacing a character 'i' with character 'j'
+     */
     private static void setMismatchCost(){
         mismatchCost = new HashMap<>();
         String[] genes = {"AA", "CC", "GG", "TT", "AC","AG","AT","CG","CT","GT"};
@@ -25,14 +31,13 @@ public class efficientSoln{
         long memUsedBefore = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
         long startTime = System.currentTimeMillis();
         setMismatchCost();
-        String fileName = "/Users/adityanarsinghpura/Desktop/USC/Algo Mine/assignment/BaseTestcases_CS570FinalProject_Updated/input2.txt";
+
+        String fileName = args[0];
         fileReader(fileName);
-        List<String> alignmentList = divideAndConquer(string1, string2);
+
+        List<String> alignmentList = divideAndConquer(inputString1, inputString2);
         String alignment1 = alignmentList.get(0);
         String alignment2 = alignmentList.get(1);
-
-        System.out.println(alignment1.substring(0,50) + " " + alignment1.substring(alignment1.length() - 50));
-        System.out.println(alignment2.substring(0,50) + " " + alignment2.substring(alignment2.length() - 50));
 
         int minCost = 0;
         for(int i = 0; i < alignment1.length(); i++)
@@ -43,18 +48,21 @@ public class efficientSoln{
                 minCost += mismatchCost.get(alignment1.charAt(i) + "" + alignment2.charAt(i));
         }
 
-        System.out.println(minCost);
         long endTime = System.currentTimeMillis();
-        System.out.println("takes " + (endTime - startTime)*(Math.pow(10,-3)) + "s");
         long memUsedAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-        System.out.println("Memory used by the program " + (memUsedAfter-memUsedBefore));
+
+        writeAlignmentToFile(alignment1, alignment2, minCost, (memUsedAfter-memUsedBefore) / 1024,
+                (endTime - startTime)*(Math.pow(10,-3)), OUTPUT_FILENAME );
     }
 
     /**
-     I dont know what to write!!
-     @param index
-     @param input
-     @return The merged list of the soln?
+     This function fills the OPT array using the recurrence to find the minimum cost alignment and invokes findAlignment
+     to return the actual alignment
+     @param string1 : 1st input string
+     @param string2 : 2nd input string
+     @param gapPenalty : the penalty for adding a gap ("_")
+     @param mismatchCost : a hashmap consisting of penalties for replacing a character 'i' with character 'j'
+     @return The alignment is returned as a list of 2 strings
      */
     private static List<String> findMinCostAlignment(String string1, String string2, int gapPenalty, Map<String, Integer> mismatchCost)
     {
@@ -78,10 +86,13 @@ public class efficientSoln{
     }
 
     /**
-     I dont know what to write!!
-     @param index
-     @param input
-     @return The merged list of the soln?
+     This function finds the actual alignment of the strings by backtracking the OPT array values
+     @param OPT : the OPT array consisting of cost of alignments
+     @param string1 : 1st input string
+     @param string2 : 2nd input string
+     @param gapPenalty : the penalty for adding a gap ("_")
+     @param mismatchCost : a hashmap consisting of penalties for replacing a character 'i' with character 'j'
+     @return The alignment is returned as a list of 2 strings
      */
     private static List<String> findAlignment(int[][] OPT, String string1, String string2, int gapPenalty, Map<String, Integer> mismatchCost)
     {
@@ -128,10 +139,10 @@ public class efficientSoln{
     }
 
     /**
-     I dont know what to write!!
-     @param index
-     @param input
-     @return The merged list of the soln?
+     This function generates the input string from the base string and index provided in input.txt
+     @param input : The base string
+     @param index : The index where the string needs to be added again
+     @return The input string to be used for alignment
      */
     private static String inputGenerator(String input, int index)
     {
@@ -141,16 +152,16 @@ public class efficientSoln{
     }
 
     /**
-     I dont know what to write!!
-     @param list1
-     @param list2
-     @return The merged list of the soln?
+     This function merges 2 lists containing the alignment
+     @param alignList1 : 1st alignment list consisting of 2 alignment strings
+     @param alignList2 : 2nd alignment list consisting of 2 alignment strings
+     @return The merged alignment
      */
-    public static List<String> mergeList(List<String> list1, List<String> list2)
+    public static List<String> mergeList(List<String> alignList1, List<String> alignList2)
     {
         List<String> mergedList = new ArrayList<>();
-        mergedList.add(list1.get((0)) + list2.get(0));
-        mergedList.add(list1.get((1)) + list2.get(1));
+        mergedList.add(alignList1.get((0)) + alignList2.get(0));
+        mergedList.add(alignList1.get((1)) + alignList2.get(1));
         return mergedList;
     }
 
@@ -161,7 +172,7 @@ public class efficientSoln{
      with the calculated value.
      @param str1 DNA sequence - 1
      @param str2 DNA sequence - 2
-     @return the last row of the OPT
+     @return the last row of the OPT array
      */
     public static Integer[] efficientDP(String str1, String str2)
     {
@@ -202,7 +213,7 @@ public class efficientSoln{
      * @param str1 DNA sequence - 1
      * @param str2 DNA sequence - 2
      * both these params are used to find the best matching
-     * @return 2 list of strings
+     * @return a list containing 2 alignment strings
      */
     public static List<String> divideAndConquer(String str1, String str2)
     {
@@ -213,10 +224,13 @@ public class efficientSoln{
         else
         {
             int xMidPoint = str1.length()/2 % 2 == 0? str1.length()/2 : str1.length()/2 + 1;
+
             String xRightReverse = new StringBuilder(str1.substring(xMidPoint)).reverse().toString();
             String yReverse = new StringBuilder(str2).reverse().toString();
+
             Integer[] Xl = efficientDP(str1.substring(0, xMidPoint), str2);
             Integer[] Xr = efficientDP(xRightReverse, yReverse);
+
             int ySplitPoint = -1, currMinCost = Integer.MAX_VALUE;
             List<Integer> list = new ArrayList<>();
             for(int j = Xr.length-1; j >= 0; j-- )
@@ -224,7 +238,9 @@ public class efficientSoln{
                 list.add(Xr[j]);
             }
             Xr = list.toArray(new Integer[list.size()]);
+
             int cost1, cost2;
+
             for(int k = 0; k < Xl.length; k++)
             {
                 cost1 = Xl[k];
@@ -235,16 +251,17 @@ public class efficientSoln{
                     currMinCost = cost1 + cost2;
                 }
             }
-            List<String> list1 = divideAndConquer(str1.substring(0, xMidPoint), str2.substring(0,ySplitPoint));
-            List<String> list2 = divideAndConquer(str1.substring(xMidPoint), str2.substring(ySplitPoint));
-            return mergeList(list1, list2);
+
+            List<String> alignList1 = divideAndConquer(str1.substring(0, xMidPoint), str2.substring(0,ySplitPoint));
+            List<String> alignList2 = divideAndConquer(str1.substring(xMidPoint), str2.substring(ySplitPoint));
+            return mergeList(alignList1, alignList2);
         }
     }
 
     /**
      Create two different strings appended again and again at the location specified after the
      string in the file.
-     @param fileName  the name of the file to read from
+     @param fileName : the name of the file to read from
      @throws FileNotFoundException if the file is not found
      */
     private static void fileReader(String fileName){
@@ -257,7 +274,7 @@ public class efficientSoln{
                 data = data.trim();
                 if(Character.isAlphabetic(data.charAt((0)))) {
                     if(!tempString.equals(""))
-                        string1 = tempString;
+                        inputString1 = tempString;
 
                     tempString = data;
                 }
@@ -266,12 +283,41 @@ public class efficientSoln{
                     tempString = inputGenerator(tempString, Integer.parseInt(data));
                 }
             }
-            string2 = tempString;
+            inputString2 = tempString;
             myReader.close();
         }
         catch (FileNotFoundException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
         }
+    }
+
+    /**
+     This function writes the alignment (first 50 & last 50 characters), the alignment cost, the time & memory taken by
+     the program to "Output.txt" file
+     @param alignStr1 : alignment of the 1st string
+     @param alignStr2 : alignment of the 2nd string
+     @param alignCost : minimum cost of alignment between the strings
+     @param memory : total Memory used by the program
+     @param execTime : total time taken by the program
+     @param filename : output filename
+     @throws FileNotFoundException if the file is not found
+     */
+    private static void writeAlignmentToFile(String alignStr1, String alignStr2, double alignCost, double memory, double execTime, String filename)
+    {
+        String line1 = alignStr1.substring(0,50) + " " + alignStr2.substring(0,50);
+        String line2 = alignStr1.substring(alignStr1.length() - 50) + " " + alignStr2.substring(alignStr2.length() - 50);
+
+        List<String> lines = Arrays.asList(line1, line2, String.valueOf(alignCost), String.valueOf(execTime), String.valueOf(memory));
+        Path file = Paths.get(filename);
+        try
+        {
+            Files.write(file, lines, StandardCharsets.UTF_8);
+        }
+        catch(Exception e)
+        {
+            System.out.println("Exception occurred while writing to File : " + e.toString());
+        }
+
     }
 }

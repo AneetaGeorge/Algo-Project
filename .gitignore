@@ -2,3 +2,5 @@
 out/
 .idea/
 Output.txt
+*.class
+input.txt

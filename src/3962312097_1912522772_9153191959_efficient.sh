@@ -1,0 +1,4 @@
+#!/bin/bash
+
+javac Efficient_3962312097_1912522772_9153191959.java
+java Efficient_3962312097_1912522772_9153191959 input.txt
