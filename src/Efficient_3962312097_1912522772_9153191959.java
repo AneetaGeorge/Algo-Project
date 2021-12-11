@@ -174,7 +174,7 @@ public class Efficient_3962312097_1912522772_9153191959{
      @param str2 DNA sequence - 2
      @return the last row of the OPT array
      */
-    public static Integer[] efficientDP(String str1, String str2)
+    public static Integer[] memoryEfficientDP(String str1, String str2)
     {
         Integer[][] OPT = new Integer[2][str2.length()+1];
         for(int i = 0; i < str2.length() + 1; i++)
@@ -228,8 +228,8 @@ public class Efficient_3962312097_1912522772_9153191959{
             String xRightReverse = new StringBuilder(str1.substring(xMidPoint)).reverse().toString();
             String yReverse = new StringBuilder(str2).reverse().toString();
 
-            Integer[] Xl = efficientDP(str1.substring(0, xMidPoint), str2);
-            Integer[] Xr = efficientDP(xRightReverse, yReverse);
+            Integer[] Xl = memoryEfficientDP(str1.substring(0, xMidPoint), str2);
+            Integer[] Xr = memoryEfficientDP(xRightReverse, yReverse);
 
             int ySplitPoint = -1, currMinCost = Integer.MAX_VALUE;
             List<Integer> list = new ArrayList<>();
@@ -308,7 +308,7 @@ public class Efficient_3962312097_1912522772_9153191959{
         String line1 = alignStr1.substring(0,50) + " " + alignStr2.substring(0,50);
         String line2 = alignStr1.substring(alignStr1.length() - 50) + " " + alignStr2.substring(alignStr2.length() - 50);
 
-        List<String> lines = Arrays.asList(line1, line2, String.valueOf(alignCost), String.valueOf(execTime), String.valueOf(memory));
+        List<String> lines = Arrays.asList(line1, line2, String.valueOf(alignCost), String.valueOf(memory), String.valueOf(execTime));
         Path file = Paths.get(filename);
         try
         {

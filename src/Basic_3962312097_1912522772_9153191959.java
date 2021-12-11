@@ -211,7 +211,7 @@ public class Basic_3962312097_1912522772_9153191959 {
         String line1 = alignStr1.substring(0,50) + " " + alignStr2.substring(0,50);
         String line2 = alignStr1.substring(alignStr1.length() - 50) + " " + alignStr2.substring(alignStr2.length() - 50);
 
-        List<String> lines = Arrays.asList(line1, line2, String.valueOf(alignCost), String.valueOf(execTime), String.valueOf(memory));
+        List<String> lines = Arrays.asList(line1, line2, String.valueOf(alignCost), String.valueOf(memory), String.valueOf(execTime));
         Path file = Paths.get(filename);
         try
         {
